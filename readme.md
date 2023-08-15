@@ -12,7 +12,7 @@ Simple implementation of Conway's Game of Life written in Go using the [raylib](
 
 
 ```shell
-go intall github.com/Xotchkass/Go_of_Life@latest
+go install github.com/Xotchkass/Go_of_Life@latest
 Go_of_Life
 ```
 
