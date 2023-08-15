@@ -1,5 +1,5 @@
 
-# Game of Life
+# Go of Life
 
 Simple implementation of Conway's Game of Life written in Go using the [raylib](https://www.raylib.com/) library.
 
