@@ -54,11 +54,13 @@ func (b *board) next(r ruleset) {
 func (b *board) get_cell(screen_pos rl.Vector2) *bool {
 	x := int(screen_pos.X) / CELL_WIDTH
 	y := int(screen_pos.Y) / CELL_HEIGHT
+	if x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT {
+		return nil
+	}
 	return &b[x][y]
 }
 
 func conway(b *board, x, y int) bool {
-
 	alive := 0
 	for i := -1; i < 2; i++ {
 		for j := -1; j < 2; j++ {
@@ -100,6 +102,9 @@ var (
 	ups        uint32 = 3
 	dt                = float32(0)
 
+	last_update  = float32(0)
+	update_delay = float32(1) / float32(ups)
+
 	pause = true
 
 	change_speed_cd_counter = change_speed_cd
@@ -131,7 +136,7 @@ func change_speed(increase bool) {
 		fps = 120
 		rl.SetTargetFPS(int32(fps))
 	}
-
+	update_delay = float32(1) / float32(ups)
 }
 
 func handle_input() {
@@ -176,10 +181,16 @@ func handle_input() {
 	}
 
 	if rl.IsMouseButtonDown(rl.MouseLeftButton) {
-		*BOARD.get_cell(rl.GetMousePosition()) = true
+		cell := BOARD.get_cell(rl.GetMousePosition())
+		if cell != nil {
+			*cell = true
+		}
 	}
 	if rl.IsMouseButtonDown(rl.MouseRightButton) {
-		*BOARD.get_cell(rl.GetMousePosition()) = false
+		cell := BOARD.get_cell(rl.GetMousePosition())
+		if cell != nil {
+			*cell = false
+		}
 	}
 }
 
@@ -188,12 +199,12 @@ func start() {
 }
 
 func update() {
-
 	BOARD.next(conway)
-
 }
 
 func draw() {
+	rl.BeginDrawing()
+	defer rl.EndDrawing()
 	rl.ClearBackground(rl.GetColor(0x3c3c3cFF))
 	for i := int32(0); i < BOARD_WIDTH; i++ {
 		for j := int32(0); j < BOARD_HEIGHT; j++ {
@@ -214,18 +225,17 @@ func main() {
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(int32(fps))
 	start()
-	last_update := float32(0)
 
 	for !rl.WindowShouldClose() {
 		info := fmt.Sprintf("Current UPS: %v | Current FPS: %v", ups, fps)
 		var current_title string
 		if pause {
-			 current_title = fmt.Sprintf("%s | Paused", title)
+			current_title = fmt.Sprintf("%s | Paused", title)
 		} else {
-			 current_title = fmt.Sprintf("%s | %s", title, info)
+			current_title = fmt.Sprintf("%s | %s", title, info)
 		}
 		rl.SetWindowTitle(current_title)
-		update_delay := float32(1) / float32(ups)
+
 		dt = rl.GetFrameTime()
 		last_update += dt
 
@@ -237,9 +247,6 @@ func main() {
 			}
 			last_update = 0
 		}
-
-		rl.BeginDrawing()
 		draw()
-		rl.EndDrawing()
 	}
 }
