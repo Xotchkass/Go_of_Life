@@ -19,7 +19,7 @@ Go_of_Life
 or
 
 ```shell
-go clone https://github.com/Xotchkass/Go_of_Life
+git clone https://github.com/Xotchkass/Go_of_Life
 cd Go_of_Life
 go build
 ./Go_of_Life
